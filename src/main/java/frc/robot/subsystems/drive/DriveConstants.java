@@ -56,7 +56,7 @@ public class DriveConstants {
   // Drive motor configuration
   public static final int driveMotorCurrentLimit = 50;
   public static final double wheelRadiusMeters = Constants.WHEEL_RADIUS;
-  public static final double driveMotorReduction = 60.0 / 9.0;
+  public static final double driveMotorReduction = 1 / Constants.DRIVE_GEAR_RATIO;
   public static final DCMotor driveGearbox = DCMotor.getNeo550(1);
 
   // Drive encoder configuration
@@ -78,7 +78,7 @@ public class DriveConstants {
   // Turn motor configuration
   public static final boolean turnInverted = false;
   public static final int turnMotorCurrentLimit = 20;
-  public static final double turnMotorReduction = 396.0 / 35.0;
+  public static final double turnMotorReduction = 1 / Constants.TURN_GEAR_RATIO;
   public static final DCMotor turnGearbox = DCMotor.getNeo550(1);
 
   // Turn encoder configuration

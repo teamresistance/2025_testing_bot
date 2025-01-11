@@ -13,6 +13,8 @@
 
 package frc.robot.subsystems.drive;
 
+import static frc.robot.Constants.DRIVE_GEAR_RATIO;
+import static frc.robot.Constants.TURN_GEAR_RATIO;
 import static frc.robot.subsystems.drive.DriveConstants.*;
 import static frc.robot.util.SparkUtil.*;
 
@@ -20,7 +22,6 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
-import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.*;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -51,7 +52,7 @@ public class ModuleIOSpark implements ModuleIO {
   private final SparkBase driveSpark;
   private final SparkBase turnSpark;
   private final RelativeEncoder driveEncoder;
-  private final AbsoluteEncoder turnEncoder;
+  private final RelativeEncoder turnEncoder;
   private final CANcoder cancoder;
 
   // Closed loop controllers
@@ -80,7 +81,7 @@ public class ModuleIOSpark implements ModuleIO {
           default -> new Rotation2d();
         };
     driveSpark =
-        new SparkFlex(
+        new SparkMax(
             switch (module) {
               case 0 -> frontLeftDriveCanId;
               case 1 -> frontRightDriveCanId;
@@ -120,7 +121,7 @@ public class ModuleIOSpark implements ModuleIO {
         };
 
     driveEncoder = driveSpark.getEncoder();
-    turnEncoder = turnSpark.getAbsoluteEncoder();
+    turnEncoder = turnSpark.getEncoder();
     driveController = driveSpark.getClosedLoopController();
     turnController = turnSpark.getClosedLoopController();
 
@@ -171,23 +172,23 @@ public class ModuleIOSpark implements ModuleIO {
         .smartCurrentLimit(turnMotorCurrentLimit)
         .voltageCompensation(12.0);
     turnConfig
-        .absoluteEncoder
-        .inverted(turnEncoderInverted)
+        .encoder
         .positionConversionFactor(turnEncoderPositionFactor)
         .velocityConversionFactor(turnEncoderVelocityFactor)
-        .averageDepth(2);
+        .uvwMeasurementPeriod(10)
+        .uvwAverageDepth(2);
     turnConfig
         .closedLoop
-        .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .positionWrappingEnabled(true)
         .positionWrappingInputRange(turnPIDMinInput, turnPIDMaxInput)
         .pidf(turnKp, 0.0, turnKd, 0.0);
     turnConfig
         .signals
-        .absoluteEncoderPositionAlwaysOn(true)
-        .absoluteEncoderPositionPeriodMs((int) (1000.0 / odometryFrequency))
-        .absoluteEncoderVelocityAlwaysOn(true)
-        .absoluteEncoderVelocityPeriodMs(20)
+        .primaryEncoderPositionAlwaysOn(true)
+        .primaryEncoderPositionPeriodMs((int) (1000.0 / odometryFrequency))
+        .primaryEncoderVelocityAlwaysOn(true)
+        .primaryEncoderVelocityPeriodMs(20)
         .appliedOutputPeriodMs(20)
         .busVoltagePeriodMs(20)
         .outputCurrentPeriodMs(20);
@@ -213,8 +214,16 @@ public class ModuleIOSpark implements ModuleIO {
     BaseStatusSignal.refreshAll(turnAbsolutePosition);
     // Update drive inputs
     sparkStickyFault = false;
-    ifOk(driveSpark, driveEncoder::getPosition, (value) -> inputs.drivePositionRad = value);
-    ifOk(driveSpark, driveEncoder::getVelocity, (value) -> inputs.driveVelocityRadPerSec = value);
+    ifOk(
+        driveSpark,
+        driveEncoder::getPosition,
+        (value) -> inputs.drivePositionRad = Units.rotationsToRadians(value) / DRIVE_GEAR_RATIO);
+    ifOk(
+        driveSpark,
+        driveEncoder::getVelocity,
+        (value) ->
+            inputs.driveVelocityRadPerSec =
+                Units.rotationsPerMinuteToRadiansPerSecond(value) / DRIVE_GEAR_RATIO);
     ifOk(
         driveSpark,
         new DoubleSupplier[] {driveSpark::getAppliedOutput, driveSpark::getBusVoltage},
@@ -227,8 +236,13 @@ public class ModuleIOSpark implements ModuleIO {
     ifOk(
         turnSpark,
         turnEncoder::getPosition,
-        (value) -> inputs.turnPosition = new Rotation2d(value).minus(zeroRotation));
-    ifOk(turnSpark, turnEncoder::getVelocity, (value) -> inputs.turnVelocityRadPerSec = value);
+        (value) ->
+            inputs.turnPosition = new Rotation2d(value / TURN_GEAR_RATIO).minus(zeroRotation));
+    ifOk(
+        turnSpark,
+        () ->
+            Units.rotationsPerMinuteToRadiansPerSecond(turnEncoder.getVelocity()) / TURN_GEAR_RATIO,
+        (value) -> inputs.turnVelocityRadPerSec = value);
     ifOk(
         turnSpark,
         new DoubleSupplier[] {turnSpark::getAppliedOutput, turnSpark::getBusVoltage},
@@ -237,18 +251,28 @@ public class ModuleIOSpark implements ModuleIO {
     inputs.turnConnected = turnConnectedDebounce.calculate(!sparkStickyFault);
 
     inputs.turnAbsolutePosition =
-        Rotation2d.fromRotations(turnAbsolutePosition.getValueAsDouble())
-            .minus(absoluteEncoderOffset);
+        Rotation2d.fromRotations(-turnAbsolutePosition.getValueAsDouble())
+            .plus(absoluteEncoderOffset);
 
-    // Update odometry inputs
+    //    // Update odometry inputs
+    //    inputs.odometryTimestamps =
+    //        timestampQueue.stream().mapToDouble((Double value) -> value).toArray();
+    //    inputs.odometryDrivePositionsRad =
+    //        drivePositionQueue.stream().mapToDouble((Double value) -> value).toArray();
+    //    inputs.odometryTurnPositions =
+    //        turnPositionQueue.stream()
+    //            .map((Double value) -> new Rotation2d(value).minus(zeroRotation))
+    //            .toArray(Rotation2d[]::new);
+
     inputs.odometryTimestamps =
         timestampQueue.stream().mapToDouble((Double value) -> value).toArray();
     inputs.odometryDrivePositionsRad =
-        drivePositionQueue.stream().mapToDouble((Double value) -> value).toArray();
+        drivePositionQueue.stream()
+            .mapToDouble((Double value) -> Units.rotationsToRadians(value) / DRIVE_GEAR_RATIO)
+            .toArray();
     inputs.odometryTurnPositions =
-        turnPositionQueue.stream()
-            .map((Double value) -> new Rotation2d(value).minus(zeroRotation))
-            .toArray(Rotation2d[]::new);
+        turnPositionQueue.stream().map(Rotation2d::fromRotations).toArray(Rotation2d[]::new);
+
     timestampQueue.clear();
     drivePositionQueue.clear();
     turnPositionQueue.clear();
