@@ -33,7 +33,7 @@ public final class Constants {
   public static final double TRACK_WIDTH_Y =
       Units.inchesToMeters(22.398); // Y is parallel to the front of the robot
   public static final double DRIVE_GEAR_RATIO = 60.0 / 9.0;
-  public static final double TURN_GEAR_RATIO = 1.25 * 396.0 / 35.0; // (24.0 / 8) * (72.0 / 14);
+  public static final double TURN_GEAR_RATIO = 396.0 / 35.0; // (24.0 / 8) * (72.0 / 14);
   // Motor and encoder constants
   public static final int DRIVE_SPARK_MAX_FL = 24;
   public static final int TURN_SPARK_MAX_FL = 25;
