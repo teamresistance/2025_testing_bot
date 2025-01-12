@@ -33,24 +33,24 @@ public final class Constants {
   public static final double TRACK_WIDTH_Y =
       Units.inchesToMeters(22.398); // Y is parallel to the front of the robot
   public static final double DRIVE_GEAR_RATIO = 60.0 / 9.0;
-  public static final double TURN_GEAR_RATIO = 396.0 / 35.0; // (24.0 / 8) * (72.0 / 14);
+  public static final double TURN_GEAR_RATIO = 1.25 * 396.0 / 35.0; // (24.0 / 8) * (72.0 / 14);
   // Motor and encoder constants
   public static final int DRIVE_SPARK_MAX_FL = 24;
   public static final int TURN_SPARK_MAX_FL = 25;
   public static final int CANCODER_FL = 33;
-  public static final double ABSOLUTE_ENCODER_OFFSET_FL = 0.668;
+  public static final double ABSOLUTE_ENCODER_OFFSET_FL = 0.671883;
   public static final int DRIVE_SPARK_MAX_FR = 26;
   public static final int TURN_SPARK_MAX_FR = 27;
   public static final int CANCODER_FR = 30;
-  public static final double ABSOLUTE_ENCODER_OFFSET_FR = 0.780 - 0.5;
+  public static final double ABSOLUTE_ENCODER_OFFSET_FR = 1.2041749;
   public static final int DRIVE_SPARK_MAX_BL = 23;
   public static final int TURN_SPARK_MAX_BL = 22;
   public static final int CANCODER_BL = 32;
-  public static final double ABSOLUTE_ENCODER_OFFSET_BL = 0.054;
+  public static final double ABSOLUTE_ENCODER_OFFSET_BL = 0.628932;
   public static final int DRIVE_SPARK_MAX_BR = 21;
   public static final int TURN_SPARK_MAX_BR = 20;
   public static final int CANCODER_BR = 31;
-  public static final double ABSOLUTE_ENCODER_OFFSET_BR = 0.646 + 0.5;
+  public static final double ABSOLUTE_ENCODER_OFFSET_BR = -3.0305295;
   // Gyro
   public static final int PIGEON2_CAN_ID = 26;
   // Odometry

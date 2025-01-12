@@ -77,7 +77,7 @@ public class DriveConstants {
   public static final double driveSimKv = 0.0789;
 
   // Turn motor configuration
-  public static final boolean turnInverted = false;
+  public static final boolean turnInverted = true;
   public static final int turnMotorCurrentLimit = 30;
   public static final double turnMotorReduction = Constants.TURN_GEAR_RATIO;
   public static final DCMotor turnGearbox = DCMotor.getNeo550(1);
@@ -90,7 +90,7 @@ public class DriveConstants {
       (2 * Math.PI) / 60.0 / turnMotorReduction; // RPM -> Rad/Sec
 
   // Turn PID configuration
-  public static final double turnKp = 0.1;
+  public static final double turnKp = 5.0;
   public static final double turnKd = 0.0;
   public static final double turnSimP = 8.0;
   public static final double turnSimD = 0.0;

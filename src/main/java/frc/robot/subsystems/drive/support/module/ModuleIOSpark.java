@@ -45,7 +45,7 @@ import java.util.function.DoubleSupplier;
  * and duty cycle absolute encoder.
  */
 public class ModuleIOSpark implements ModuleIO {
-  private final Rotation2d zeroRotation;
+  public final Rotation2d zeroRotation;
 
   // Hardware objects
   private final SparkBase driveSpark;
@@ -73,10 +73,10 @@ public class ModuleIOSpark implements ModuleIO {
   public ModuleIOSpark(int module) {
     zeroRotation =
         switch (module) {
-          case 0 -> frontLeftZeroRotation;
-          case 1 -> frontRightZeroRotation;
-          case 2 -> backLeftZeroRotation;
-          case 3 -> backRightZeroRotation;
+          case 0 -> new Rotation2d(0); // new Rotation2d(Constants.ABSOLUTE_ENCODER_OFFSET_FL);
+          case 1 -> new Rotation2d(0); // new Rotation2d(Constants.ABSOLUTE_ENCODER_OFFSET_FR);
+          case 2 -> new Rotation2d(0); // new Rotation2d(Constants.ABSOLUTE_ENCODER_OFFSET_BL);
+          case 3 -> new Rotation2d(0); // new Rotation2d(Constants.ABSOLUTE_ENCODER_OFFSET_BR);
           default -> new Rotation2d();
         };
     driveSpark =
@@ -237,8 +237,8 @@ public class ModuleIOSpark implements ModuleIO {
     inputs.turnConnected = turnConnectedDebounce.calculate(!sparkStickyFault);
 
     inputs.turnAbsolutePosition =
-        Rotation2d.fromRotations(-turnAbsolutePosition.getValueAsDouble())
-            .plus(absoluteEncoderOffset);
+        Rotation2d.fromRotations(turnAbsolutePosition.getValueAsDouble())
+            .minus(absoluteEncoderOffset);
     // Update odometry inputs
     inputs.odometryTimestamps =
         timestampQueue.stream().mapToDouble((Double value) -> value).toArray();
