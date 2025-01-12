@@ -38,19 +38,19 @@ public final class Constants {
   public static final int DRIVE_SPARK_MAX_FL = 24;
   public static final int TURN_SPARK_MAX_FL = 25;
   public static final int CANCODER_FL = 33;
-  public static final double ABSOLUTE_ENCODER_OFFSET_FL = 0.671883;
+  public static final double ABSOLUTE_ENCODER_OFFSET_FL = 2.5617;
   public static final int DRIVE_SPARK_MAX_FR = 26;
   public static final int TURN_SPARK_MAX_FR = 27;
   public static final int CANCODER_FR = 30;
-  public static final double ABSOLUTE_ENCODER_OFFSET_FR = 1.2041749;
+  public static final double ABSOLUTE_ENCODER_OFFSET_FR = 0.15953;
   public static final int DRIVE_SPARK_MAX_BL = 23;
   public static final int TURN_SPARK_MAX_BL = 22;
   public static final int CANCODER_BL = 32;
-  public static final double ABSOLUTE_ENCODER_OFFSET_BL = 0.628932;
+  public static final double ABSOLUTE_ENCODER_OFFSET_BL = -1.267;
   public static final int DRIVE_SPARK_MAX_BR = 21;
   public static final int TURN_SPARK_MAX_BR = 20;
   public static final int CANCODER_BR = 31;
-  public static final double ABSOLUTE_ENCODER_OFFSET_BR = -3.0305295;
+  public static final double ABSOLUTE_ENCODER_OFFSET_BR = -0.66728;
   // Gyro
   public static final int PIGEON2_CAN_ID = 26;
   // Odometry

@@ -59,8 +59,7 @@ public class Drive extends SubsystemBase {
   public static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
-  private final frc.robot.subsystems.drive.support.module.Module[] modules =
-      new frc.robot.subsystems.drive.support.module.Module[4]; // FL, FR, BL, BR
+  public final Module[] modules = new Module[4]; // FL, FR, BL, BR
   private final SysIdRoutine sysId;
   private final Alert gyroDisconnectedAlert =
       new Alert("Disconnected gyro, using kinematics as fallback.", AlertType.kError);
@@ -84,10 +83,10 @@ public class Drive extends SubsystemBase {
       ModuleIO blModuleIO,
       ModuleIO brModuleIO) {
     this.gyroIO = gyroIO;
-    modules[0] = new frc.robot.subsystems.drive.support.module.Module(flModuleIO, 0);
+    modules[0] = new Module(flModuleIO, 0);
     modules[1] = new Module(frModuleIO, 1);
-    modules[2] = new frc.robot.subsystems.drive.support.module.Module(blModuleIO, 2);
-    modules[3] = new frc.robot.subsystems.drive.support.module.Module(brModuleIO, 3);
+    modules[2] = new Module(blModuleIO, 2);
+    modules[3] = new Module(brModuleIO, 3);
 
     // Usage reporting for swerve template
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_AdvantageKit);

@@ -33,7 +33,6 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import frc.robot.Constants;
 import frc.robot.subsystems.drive.support.SparkOdometryThread;
@@ -112,10 +111,10 @@ public class ModuleIOSpark implements ModuleIO {
 
     absoluteEncoderOffset =
         switch (module) {
-          case 0 -> new Rotation2d(Units.rotationsToRadians(Constants.ABSOLUTE_ENCODER_OFFSET_FL));
-          case 1 -> new Rotation2d(Units.rotationsToRadians(Constants.ABSOLUTE_ENCODER_OFFSET_FR));
-          case 2 -> new Rotation2d(Units.rotationsToRadians(Constants.ABSOLUTE_ENCODER_OFFSET_BL));
-          case 3 -> new Rotation2d(Units.rotationsToRadians(Constants.ABSOLUTE_ENCODER_OFFSET_BR));
+          case 0 -> new Rotation2d((Constants.ABSOLUTE_ENCODER_OFFSET_FL));
+          case 1 -> new Rotation2d((Constants.ABSOLUTE_ENCODER_OFFSET_FR));
+          case 2 -> new Rotation2d((Constants.ABSOLUTE_ENCODER_OFFSET_BL));
+          case 3 -> new Rotation2d((Constants.ABSOLUTE_ENCODER_OFFSET_BR));
           default -> new Rotation2d();
         };
 
