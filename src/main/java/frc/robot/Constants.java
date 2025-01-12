@@ -57,6 +57,7 @@ public final class Constants {
   public static final double ODOMETRY_FREQUENCY = 250.0; // ! was oficially 100.0
   public static final double WHEEL_RADIUS = Units.inchesToMeters(2.05) * 1 / 1.1132075472;
   public static final boolean FIELD_MIRROR = false;
+  public static final double ROBOT_MASS_LBS = 150;
 
   public static enum Mode {
     /** Running on a real robot. */

@@ -18,6 +18,7 @@ import com.pathplanner.lib.config.RobotConfig;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 
 public class DriveConstants {
@@ -56,7 +57,7 @@ public class DriveConstants {
   // Drive motor configuration
   public static final int driveMotorCurrentLimit = 50;
   public static final double wheelRadiusMeters = Constants.WHEEL_RADIUS;
-  public static final double driveMotorReduction = 1 / Constants.DRIVE_GEAR_RATIO;
+  public static final double driveMotorReduction = Constants.DRIVE_GEAR_RATIO;
   public static final DCMotor driveGearbox = DCMotor.getNeo550(1);
 
   // Drive encoder configuration
@@ -76,15 +77,15 @@ public class DriveConstants {
   public static final double driveSimKv = 0.0789;
 
   // Turn motor configuration
-  public static final boolean turnInverted = true;
-  public static final int turnMotorCurrentLimit = 20;
+  public static final boolean turnInverted = false;
+  public static final int turnMotorCurrentLimit = 30;
   public static final double turnMotorReduction = Constants.TURN_GEAR_RATIO;
   public static final DCMotor turnGearbox = DCMotor.getNeo550(1);
 
   // Turn encoder configuration
   public static final boolean turnEncoderInverted = true;
-  public static final double turnEncoderPositionFactor = 2 * Math.PI; // Rotations -> Radians
-  public static final double turnEncoderVelocityFactor = (2 * Math.PI) / 60.0; // RPM -> Rad/Sec
+  public static final double turnEncoderPositionFactor = 2 * Math.PI / turnMotorReduction; // Rotations -> Radians
+  public static final double turnEncoderVelocityFactor = (2 * Math.PI) / 60.0 / turnMotorReduction; // RPM -> Rad/Sec
 
   // Turn PID configuration
   public static final double turnKp = 0.1;
@@ -95,7 +96,7 @@ public class DriveConstants {
   public static final double turnPIDMaxInput = 2 * Math.PI; // Radians
 
   // PathPlanner configuration
-  public static final double robotMassKg = 140.0;
+  public static final double robotMassKg = Units.lbsToKilograms(Constants.ROBOT_MASS_LBS);
   public static final double robotMOI = 6.883;
   public static final double wheelCOF = 1.2;
   public static final RobotConfig ppConfig =

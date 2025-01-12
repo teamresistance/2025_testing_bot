@@ -212,67 +212,43 @@ public class ModuleIOSpark implements ModuleIO {
   @Override
   public void updateInputs(ModuleIOInputs inputs) {
     BaseStatusSignal.refreshAll(turnAbsolutePosition);
-    // Update drive inputs
-    sparkStickyFault = false;
-    ifOk(
-        driveSpark,
-        driveEncoder::getPosition,
-        (value) -> inputs.drivePositionRad = Units.rotationsToRadians(value) / DRIVE_GEAR_RATIO);
-    ifOk(
-        driveSpark,
-        driveEncoder::getVelocity,
-        (value) ->
-            inputs.driveVelocityRadPerSec =
-                Units.rotationsPerMinuteToRadiansPerSecond(value) / DRIVE_GEAR_RATIO);
-    ifOk(
-        driveSpark,
-        new DoubleSupplier[] {driveSpark::getAppliedOutput, driveSpark::getBusVoltage},
-        (values) -> inputs.driveAppliedVolts = values[0] * values[1]);
-    ifOk(driveSpark, driveSpark::getOutputCurrent, (value) -> inputs.driveCurrentAmps = value);
-    inputs.driveConnected = driveConnectedDebounce.calculate(!sparkStickyFault);
+      // Update drive inputs
+      sparkStickyFault = false;
+      ifOk(driveSpark, driveEncoder::getPosition, (value) -> inputs.drivePositionRad = value);
+      ifOk(driveSpark, driveEncoder::getVelocity, (value) -> inputs.driveVelocityRadPerSec = value);
+      ifOk(
+              driveSpark,
+              new DoubleSupplier[] {driveSpark::getAppliedOutput, driveSpark::getBusVoltage},
+              (values) -> inputs.driveAppliedVolts = values[0] * values[1]);
+      ifOk(driveSpark, driveSpark::getOutputCurrent, (value) -> inputs.driveCurrentAmps = value);
+      inputs.driveConnected = driveConnectedDebounce.calculate(!sparkStickyFault);
 
-    // Update turn inputs
-    sparkStickyFault = false;
-    ifOk(
-        turnSpark,
-        turnEncoder::getPosition,
-        (value) ->
-            inputs.turnPosition = new Rotation2d(value / TURN_GEAR_RATIO).minus(zeroRotation));
-    ifOk(
-        turnSpark,
-        () ->
-            Units.rotationsPerMinuteToRadiansPerSecond(turnEncoder.getVelocity()) / TURN_GEAR_RATIO,
-        (value) -> inputs.turnVelocityRadPerSec = value);
-    ifOk(
-        turnSpark,
-        new DoubleSupplier[] {turnSpark::getAppliedOutput, turnSpark::getBusVoltage},
-        (values) -> inputs.turnAppliedVolts = values[0] * values[1]);
-    ifOk(turnSpark, turnSpark::getOutputCurrent, (value) -> inputs.turnCurrentAmps = value);
-    inputs.turnConnected = turnConnectedDebounce.calculate(!sparkStickyFault);
+      // Update turn inputs
+      sparkStickyFault = false;
+      ifOk(
+              turnSpark,
+              turnEncoder::getPosition,
+              (value) -> inputs.turnPosition = new Rotation2d(value).minus(zeroRotation));
+      ifOk(turnSpark, turnEncoder::getVelocity, (value) -> inputs.turnVelocityRadPerSec = value);
+      ifOk(
+              turnSpark,
+              new DoubleSupplier[] {turnSpark::getAppliedOutput, turnSpark::getBusVoltage},
+              (values) -> inputs.turnAppliedVolts = values[0] * values[1]);
+      ifOk(turnSpark, turnSpark::getOutputCurrent, (value) -> inputs.turnCurrentAmps = value);
+      inputs.turnConnected = turnConnectedDebounce.calculate(!sparkStickyFault);
 
     inputs.turnAbsolutePosition =
         Rotation2d.fromRotations(-turnAbsolutePosition.getValueAsDouble())
             .plus(absoluteEncoderOffset);
-
-    //    // Update odometry inputs
-    //    inputs.odometryTimestamps =
-    //        timestampQueue.stream().mapToDouble((Double value) -> value).toArray();
-    //    inputs.odometryDrivePositionsRad =
-    //        drivePositionQueue.stream().mapToDouble((Double value) -> value).toArray();
-    //    inputs.odometryTurnPositions =
-    //        turnPositionQueue.stream()
-    //            .map((Double value) -> new Rotation2d(value).minus(zeroRotation))
-    //            .toArray(Rotation2d[]::new);
-
-    inputs.odometryTimestamps =
-        timestampQueue.stream().mapToDouble((Double value) -> value).toArray();
-    inputs.odometryDrivePositionsRad =
-        drivePositionQueue.stream()
-            .mapToDouble((Double value) -> Units.rotationsToRadians(value) / DRIVE_GEAR_RATIO)
-            .toArray();
-    inputs.odometryTurnPositions =
-        turnPositionQueue.stream().map(Rotation2d::fromRotations).toArray(Rotation2d[]::new);
-
+      // Update odometry inputs
+      inputs.odometryTimestamps =
+              timestampQueue.stream().mapToDouble((Double value) -> value).toArray();
+      inputs.odometryDrivePositionsRad =
+              drivePositionQueue.stream().mapToDouble((Double value) -> value).toArray();
+      inputs.odometryTurnPositions =
+              turnPositionQueue.stream()
+                      .map((Double value) -> new Rotation2d(value).minus(zeroRotation))
+                      .toArray(Rotation2d[]::new);
     timestampQueue.clear();
     drivePositionQueue.clear();
     turnPositionQueue.clear();
